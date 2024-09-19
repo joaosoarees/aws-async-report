@@ -1,8 +1,7 @@
+import { response } from '../utils/reponse';
+
 export async function handler() {
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: 'Hello',
-    }),
-  };
+  return response(200, {
+    message: 'Hello',
+  });
 }
