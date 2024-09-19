@@ -6,6 +6,15 @@ provider:
   runtime: nodejs20.x
   region: sa-east-1
   architecture: arm64
+  environment:
+    DYNAMO_LEADS_TABLE: !Ref LeadsTable
+  iamRole:
+    role:
+      statement:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:Scan
 
 package:
   individually: true
@@ -19,15 +28,23 @@ build:
       - '@aws-sdk/*'
 
 functions:
-  hello:
-    handler: src/functions/hello.handler
+  populateDynamo:
+    handler: src/functions/populateDynamo.handler
     events:
       - httpApi:
-          path: /hello
-          method: get
-  world:
-    handler: src/functions/world.handler
-    events:
-      - httpApi:
-          path: /world
-          method: get
+          path: /populate-dynamo
+          method: POST
+
+resources:
+  Resources:
+    LeadsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: LeadsTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
