@@ -8,13 +8,14 @@ provider:
   architecture: arm64
   environment:
     DYNAMO_LEADS_TABLE: !Ref LeadsTable
-  iamRole:
+  iam:
     role:
-      statement:
+      statements:
         - Effect: Allow
           Action:
             - dynamodb:PutItem
             - dynamodb:Scan
+          Resource: !GetAtt LeadsTable.Arn
 
 package:
   individually: true
@@ -30,6 +31,7 @@ build:
 functions:
   populateDynamo:
     handler: src/functions/populateDynamo.handler
+    timeout: 25
     events:
       - httpApi:
           path: /populate-dynamo
