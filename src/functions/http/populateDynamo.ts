@@ -2,9 +2,9 @@ import { PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { faker } from '@faker-js/faker';
 import { randomUUID } from 'node:crypto';
 
-import { dynamoClient } from '../clients/dynamoClient';
-import { env } from '../config/env';
-import { response } from '../utils/reponse';
+import { dynamoClient } from '../../clients/dynamoClient';
+import { env } from '../../config/env';
+import { response } from '../../utils/reponse';
 
 export async function handler() {
   const total = 5000;

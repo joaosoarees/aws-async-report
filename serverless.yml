@@ -37,19 +37,27 @@ build:
       - '@aws-sdk/*'
 
 functions:
+  # HTTP
   populateDynamo:
-    handler: src/functions/populateDynamo.handler
+    handler: src/functions/http/populateDynamo.handler
     timeout: 25
     events:
       - httpApi:
           path: /populate-dynamo
           method: POST
   generateReport:
-    handler: src/functions/generateReport.handler
+    handler: src/functions/http/generateReport.handler
     events:
       - httpApi:
           path: /generate-report
           method: POST
+  # QUEUE
+  processReport:
+    handler: src/functions/queues/processReport.handler
+    events:
+      - sqs:
+          arn: !GetAtt GenerateReportQueue.Arn
+          batchSize: 1
 
 resources:
   Resources:

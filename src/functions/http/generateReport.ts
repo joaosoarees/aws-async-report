@@ -1,9 +1,9 @@
 import { SendMessageCommand } from '@aws-sdk/client-sqs';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 
-import { sqsClient } from '../clients/sqsClient';
-import { env } from '../config/env';
-import { response } from '../utils/reponse';
+import { sqsClient } from '../../clients/sqsClient';
+import { env } from '../../config/env';
+import { response } from '../../utils/reponse';
 
 export async function handler(event: APIGatewayProxyEventV2) {
   const { userId, filters } = JSON.parse(event.body ?? '');
