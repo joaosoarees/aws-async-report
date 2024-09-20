@@ -7,7 +7,7 @@ import { env } from '../../config/env';
 import { response } from '../../utils/reponse';
 
 export async function handler() {
-  const total = 2500;
+  const total = 10000;
 
   const responses = await Promise.allSettled(
     Array.from({ length: total }, async () => {

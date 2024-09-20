@@ -1,6 +1,8 @@
 org: jsoareez
 service: async-report
 
+useDotEnv: true
+
 provider:
   name: aws
   runtime: nodejs20.x
@@ -10,6 +12,8 @@ provider:
   environment:
     DYNAMO_LEADS_TABLE: !Ref LeadsTable
     GENERATE_REPORT_QUEUE_URL: !Ref GenerateReportQueue
+    REPORTS_BUCKET_NAME: !Ref ReportsBucket
+    RESEND_API_KEY: ${env:RESEND_API_KEY}
   iam:
     role:
       statements:
@@ -24,6 +28,14 @@ provider:
           Action:
             - sqs:SendMessage
           Resource: !GetAtt GenerateReportQueue.Arn
+        # S3
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+            - s3:AbortMultipartUpload
+          Resource:
+            - !GetAtt ReportsBucket.Arn
+            - !Join ['/', [!GetAtt ReportsBucket.Arn, '*']]
 
 package:
   individually: true
@@ -55,6 +67,8 @@ functions:
   # QUEUE
   processReport:
     handler: src/functions/queues/processReport.handler
+    timeout: 180
+    memorySize: 512
     events:
       - sqs:
           arn: !GetAtt GenerateReportQueue.Arn
