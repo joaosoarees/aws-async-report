@@ -1,5 +1,15 @@
-import type { SQSEvent } from 'aws-lambda';
+import { paginateScan } from '@aws-sdk/client-dynamodb';
 
-export async function handler(event: SQSEvent) {
-  console.log(JSON.stringify(event, null, 2));
+import { dynamoClient } from '../../clients/dynamoClient';
+import { env } from '../../config/env';
+
+export async function handler() {
+  const paginator = paginateScan(
+    { client: dynamoClient},
+    { TableName: env.DYNAMO_LEADS_TABLE }
+  );
+
+  for await (const { Count } of paginator) {
+    console.log(Count);
+  }
 }
