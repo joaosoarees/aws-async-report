@@ -40,7 +40,7 @@ functions:
   # HTTP
   populateDynamo:
     handler: src/functions/http/populateDynamo.handler
-    timeout: 30
+    timeout: 25
     memorySize: 1024
     events:
       - httpApi:
@@ -61,31 +61,9 @@ functions:
           batchSize: 1
 
 resources:
-  Resources:
-    LeadsTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: LeadsTable
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-
-    GenerateReportQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: GenerateReport
-        ReceiveMessageWaitTimeSeconds: 20
-        VisibilityTimeout: 180
-        RedrivePolicy:
-          deadLetterTargetArn: !GetAtt GenerateReportQueueDLQ.Arn
-          maxReceiveCount: 2
-
-    GenerateReportQueueDLQ:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: GenerateReportDLQ
-        MessageRetentionPeriod: 1209600 # 14 days
+  # DynamoDB
+  - ${file(./resources/dynamodb/LeadsTable.yml)}
+  # SQS
+  - ${file(./resources/sqs/GenerateReportQueue.yml)}
+  # S3
+  - ${file(./resources/s3/ReportsBucket.yml)}
