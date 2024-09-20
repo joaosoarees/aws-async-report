@@ -1,7 +1,7 @@
 org: jsoareez
 service: async-report
 
-useDotEnv: true
+useDotenv: true
 
 provider:
   name: aws
@@ -32,6 +32,7 @@ provider:
         - Effect: Allow
           Action:
             - s3:PutObject
+            - s3:GetObject
             - s3:AbortMultipartUpload
           Resource:
             - !GetAtt ReportsBucket.Arn

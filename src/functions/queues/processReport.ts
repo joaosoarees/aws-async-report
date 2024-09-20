@@ -3,7 +3,9 @@ import { randomUUID } from 'node:crypto';
 import { env } from '../../config/env';
 import { getLeadsGenerator } from '../../db/getLeadsGenerator';
 import { S3MPUManager } from '../../services/S3MPUManager';
+import { getPresignedUrl } from '../../utils/getPresignedUrl';
 import { mbToBytes } from '../../utils/mbToBytes';
+import { sendEmail } from '../../utils/sendEmail';
 
 const minChunckSize = mbToBytes(6);
 
@@ -43,4 +45,23 @@ export async function handler() {
   } catch {
     await s3Mpu.abort();
   }
+
+  const presignedUrl = await getPresignedUrl({
+    bucket: env.REPORTS_BUCKET_NAME,
+    fileKey
+  });
+
+  await sendEmail({
+    from: 'João <onboarding@resend.dev>',
+    to: ['delivered@resend.dev'],
+    subject: 'O seu relatório já está pronto!',
+    text: `Aqui está o seu relatório (a URL é válida por apenas 24 horas): ${presignedUrl}`,
+    html: `
+      <h1 style="font-size: 32px; font-weight: bold;">Seu relatório ficou pronto!</h1>
+      <br />
+      Clique <a href="${presignedUrl}">aqui para baixar.</a>
+      <br /><br />
+      <small>Este link é válido por apenas 24 horas.</small>
+    `
+  });
 }
